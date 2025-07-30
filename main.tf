@@ -1,5 +1,5 @@
 provider "google" {
-  project = "data-hangout-464703-u3"  # 🔁 Replace with your actual project ID
+  project = "data-hangout-464703-u3"
   region  = "asia-south1"
   zone    = "asia-south1-a"
 }
@@ -9,9 +9,9 @@ data "google_compute_image" "ubuntu" {
   project = "ubuntu-os-cloud"
 }
 
-resource "google_compute_address" "build_static" {
-  name = "kayotsaha-static-ip"
-  region = "asia-south-1"
+resource "google_compute_address" "build-static" {
+  name = "build-static" 
+  region = "asia-south1"
 }
 
 resource "google_compute_firewall" "build-body" {
@@ -54,7 +54,7 @@ resource "google_compute_instance" "kayotsaha-terra" {
   network_interface {
     network = "default"
     access_config {
-      nat_ip = "google_compute_address.build_static.address"
+      nat_ip = google_compute_address.build-static.address
     }
   }
 
