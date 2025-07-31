@@ -1,9 +1,3 @@
-provider "google" {
-  project = "data-hangout-464703-u3"
-  region  = "asia-south1"
-  zone    = "asia-south1-a"
-}
-
 data "google_compute_image" "ubuntu" {
   family = "ubuntu-2404-lts-amd64"
   project = "ubuntu-os-cloud"
@@ -34,14 +28,14 @@ resource "google_compute_firewall" "build-body" {
   }
   direction = "INGRESS"
   source_ranges = ["0.0.0.0/0"]
-  target_tags = ["kayotsaha-build-tag"]
+  target_tags = var.instance_tags
 }
 
 resource "google_compute_instance" "kayotsaha-terra" {
-  name         = "kayotsaha-terra"
-  machine_type = "e2-standard-2"
-  zone         = "asia-south1-a"
-  tags         = ["kayotsaha-build-tag"]  
+  name         = var.instance-name
+  machine_type = var.working_type
+  zone         = var.zone
+  tags         = var.instance_tags 
 
   boot_disk {
     initialize_params {
@@ -59,18 +53,12 @@ resource "google_compute_instance" "kayotsaha-terra" {
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file("gcp-key.pub")}"
+    ssh-keys = "${var.ssh_user}:${file(var.ssh_public_key_path)}"
   }
 
-  metadata_startup_script = <<-EOT
-  #!/bin/bash
-  apt update
-  apt install -y python3 python3-pip docker.io docker-compose nginx git
-  curl -O https://raw.githubusercontent.com/jpl-ry/to_run_and-_install_tools/master/install_jenkins.sh
-  chmod +x *.sh
-  ./install_jenkins.sh
-EOT
+  metadata_startup_script = var.startup_script
 }
+
 
 
 
